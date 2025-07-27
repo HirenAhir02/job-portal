@@ -29,7 +29,7 @@ app.use(cookieParser());
 
 //routes api
 app.get("/meet", (req,res) => {
-   res.send("hii merr");
+   res.send("hii meet");
 })
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
