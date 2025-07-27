@@ -6,7 +6,7 @@ import { APPLICATION_API_END_POINT } from '../../utils/constant'
 import { useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { setAllApplicants } from '../../redux/applicationSlice'
-import { toast } from 'sonner'
+
 
 function Applicants() {
     const params = useParams();
@@ -34,7 +34,7 @@ function Applicants() {
     <div>
         <Navbar/>
         <div className='max-w-7xl mx-auto '>
-            <h1 className='font-bold text-xl my-5'>Applicatns ({applicants.applications.length})</h1>
+            <h1 className='font-bold text-xl my-5'>Applicatns ({applicants?.applications?.length()})</h1>
              <ApplicantsTable/>
         </div>
     </div>
