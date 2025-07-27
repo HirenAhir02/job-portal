@@ -28,6 +28,9 @@ app.use(cookieParser());
 
 
 //routes api
+app.get("/meet", (req,res) => {
+   res.send("hii merr");
+})
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
@@ -39,4 +42,3 @@ app.listen(PORT, () => {
   connectDB();  
   console.log(`Server is running on ${PORT}`);
 });
-
