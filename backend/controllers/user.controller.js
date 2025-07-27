@@ -16,7 +16,7 @@ export const register = async (req, res) => {
         }
         const file = req.file;
         const fileUri = getDataUri(file);
-        const cloudResponse  =await cloudinary.uploader.upload(fileUri.content);
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
         const user = await User.findOne({ email });
         if (user) {
@@ -32,8 +32,8 @@ export const register = async (req, res) => {
             phoneNumber,
             password: hashedPassword,
             role,
-            profile:{
-                profilePhoto:cloudResponse.secure_url
+            profile: {
+                profilePhoto: cloudResponse.secure_url
             }
         })
 
@@ -97,7 +97,12 @@ export const login = async (req, res) => {
             profile: user.profile
         }
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: "strict" }).json({
+        return res.status(200).cookie("token", token, {
+            maxAge: 1 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            secure: true,       // ✅ required for cross-origin cookies
+            sameSite: "none",    // ✅ allow cross-origin
+        }).json({
             message: `welcome back  ${user.fullname}`,
             success: true,
             user,
@@ -159,11 +164,11 @@ export const updateProfile = async (req, res) => {
         // if(file) user.resume = file;
 
         //resume comes later
-        if(cloudResponse){
+        if (cloudResponse) {
             user.profile.resume = cloudResponse.secure_url //save the cloudinary url
             user.profile.resumeOriginalName = file.originalname// save original file name 
-        } 
-        
+        }
+
 
 
 
