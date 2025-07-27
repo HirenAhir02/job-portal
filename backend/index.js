@@ -18,7 +18,7 @@ const corsOptions = {
     origin:'https://job-portal-ui-psi.vercel.app',
     credentials: true
 }
-app.use("*",cors(corsOptions));
+app.use(cors(corsOptions));
 
 
 app.use(express.json());
