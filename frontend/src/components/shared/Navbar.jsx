@@ -1,5 +1,5 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
     Popover,
     PopoverContent,
@@ -7,7 +7,7 @@ import {
 } from '../ui/popover'
 import { Avatar, AvatarImage } from '../ui/avatar'
 import { Button } from '../ui/button'
-import { LogOut, User2 } from 'lucide-react'
+import { LogOut, User2, Menu } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'sonner'
 import axios from 'axios'
@@ -15,33 +15,41 @@ import { USER_API_END_POINT } from '../../utils/constant'
 import { setUser } from '../../redux/authSlice'
 
 function Navbar() {
-    const { user } = useSelector(store => store.auth);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const { user } = useSelector(store => store.auth)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const [menuOpen, setMenuOpen] = useState(false)
 
     const logoutHandler = async () => {
         try {
             const res = await axios.get(`${USER_API_END_POINT}/logout`, { withCredentials: true })
             if (res.data.success) {
-                dispatch(setUser(null));
-                navigate("/");
+                dispatch(setUser(null))
+                navigate("/")
                 toast.success(res.data.message)
             }
         } catch (error) {
             console.log(error)
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Logout failed")
         }
     }
 
     return (
         <div className='bg-white shadow-sm'>
-            <div className='flex flex-wrap items-center justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4'>
+            <div className='flex items-center justify-between mx-auto max-w-7xl px-4 py-4'>
                 {/* Logo */}
                 <h1 className='text-2xl font-bold'>
                     Job <span className='text-[#F83002]'>Portal</span>
                 </h1>
 
-                {/* Nav Links */}
+                {/* Mobile menu button */}
+                <div className="md:hidden">
+                    <Button variant="ghost" size="icon" onClick={() => setMenuOpen(!menuOpen)}>
+                        <Menu />
+                    </Button>
+                </div>
+
+                {/* Nav Links - Desktop */}
                 <ul className='hidden md:flex items-center gap-5 font-medium'>
                     {
                         user && user.role === "recruiter" ? (
@@ -60,15 +68,15 @@ function Navbar() {
                 </ul>
 
                 {/* Auth Buttons / Profile */}
-                <div className='flex items-center gap-2 mt-4 md:mt-0'>
+                <div className='hidden md:flex items-center gap-2'>
                     {
                         !user ? (
                             <>
                                 <Link to="/login">
-                                    <Button variant='outline' className='w-full md:w-auto'>Login</Button>
+                                    <Button variant='outline'>Login</Button>
                                 </Link>
                                 <Link to="/signup">
-                                    <Button className='bg-[#6A38C2] hover:bg-[#5b30a6] w-full md:w-auto'>
+                                    <Button className='bg-[#6A38C2] hover:bg-[#5b30a6]'>
                                         Signup
                                     </Button>
                                 </Link>
@@ -113,6 +121,44 @@ function Navbar() {
                     }
                 </div>
             </div>
+
+            {/* Mobile Nav Dropdown */}
+            {menuOpen && (
+                <div className='md:hidden px-4 pb-4'>
+                    <ul className='flex flex-col gap-3 font-medium'>
+                        {
+                            user && user.role === "recruiter" ? (
+                                <>
+                                    <li><Link to="/admin/companies">Companies</Link></li>
+                                    <li><Link to="/admin/jobs">Jobs</Link></li>
+                                </>
+                            ) : (
+                                <>
+                                    <li><Link to="/">Home</Link></li>
+                                    <li><Link to="/jobs">Jobs</Link></li>
+                                    <li><Link to="/browse">Browse</Link></li>
+                                </>
+                            )
+                        }
+
+                        {
+                            !user ? (
+                                <>
+                                    <li><Link to="/login"><Button variant='outline' className='w-full'>Login</Button></Link></li>
+                                    <li><Link to="/signup"><Button className='bg-[#6A38C2] hover:bg-[#5b30a6] w-full'>Signup</Button></Link></li>
+                                </>
+                            ) : (
+                                <>
+                                    {user.role === "student" && (
+                                        <li><Link to="/profile"><Button variant="link" className="p-0 h-auto text-sm">View Profile</Button></Link></li>
+                                    )}
+                                    <li><Button onClick={logoutHandler} variant="link" className="p-0 h-auto text-sm">Logout</Button></li>
+                                </>
+                            )
+                        }
+                    </ul>
+                </div>
+            )}
         </div>
     )
 }
